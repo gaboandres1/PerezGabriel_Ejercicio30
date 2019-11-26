@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 
-data_names = ['10', '30', '100']
+data_names = ['']
 
 for node in data_names:
     data = np.loadtxt('data'+node+'.dat')/np.max(np.loadtxt('data'+node+'.dat'))

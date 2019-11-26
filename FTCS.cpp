@@ -22,26 +22,32 @@ int main(int argc, char **argv){
 	
     dX = 2.0/Nx;  
     dT = pow(dX, 2)/(2.0*D);
-    nT = Tmax / dT;
+    //nT = Tmax / dT;
     
-	
-    float **Psi = new float*[nT];
-    for(int i=0;i<nT;i++){
+	int maxNt = 15000;
+    float **Psi = new float*[maxNt];
+    for(int i=0;i<maxNt;i++){
         Psi[i] = new float[Nx];
-        **(Psi+i) = 0;
+    }
+    for(int i=0; i<Nx; i++){
+        **(Psi + i) = 0;
     }
 	
     FTCS(Psi);
     mostrarMatriz(Psi, nT, Nx);
 	
-    for(int i=0;i<nT;i++){
+    for(int i=0;i<maxNt;i++){
         delete[] Psi[i];
     }
     return 0;
 }
 
 void FTCS(float **Psi){
-    for(int n=1; n<nT; n++){
+    float dPsi;
+    int n = 1;
+    int index;
+    float maximo;
+    do{
         for(int j=0; j<Nx; j++){
             if(j == 0){
                 *(*(Psi+n)+j) = Psi1;
@@ -53,8 +59,22 @@ void FTCS(float **Psi){
                 *(*(Psi+n)+j) = *(*(Psi+n-1)+j) + 1/2.0*( *(*(Psi+n-1)+j+1) - 2*(*(*(Psi+n-1)+j)) + *(*(Psi+n-1)+j-1) ) + s*pow(dX, 2)/(2.0*D);
             }
         }
+        index = 0;
+        maximo = *(*(Psi+n)+index);
+        for(int i=1; i<Nx; i++){
+            if( *(*(Psi+n)+i) > maximo ){
+                maximo = *(*(Psi+n)+i);
+                index = i;
+            }
+        }
+        dPsi = std::abs( *(*(Psi+n)+index) - *(*(Psi+n-1)+index) )/std::abs( *(*(Psi+n)+index) );
+        n = n+1;
+        nT = n;
     }
+    while( dPsi > 10e-6 );
+
 }
+
 
 void mostrarMatriz(float **Matriz, int filas, int col){
     for(int i=0;i<filas;i++){
